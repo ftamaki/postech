@@ -5,21 +5,33 @@ from sklearn.metrics import accuracy_score
 
 # Dados de exemplo
 textos_originais = [
-    "O novo lançamento da Apple",
-    "Resultado do jogo de ontem",
-    "Eleições presidenciais",
-    "Atualização no mundo da tecnologia",
-    "Campeonato de futebol",
-    "Política internacional"
+    "Eu adorei o novo filme! As atuações foram incríveis.",
+    "Este produto é horrível e não funciona como esperado.",
+    "A comida estava deliciosa e o ambiente muito agradável.",
+    "Fiquei extremamente decepcionado com o serviço.",
+    "Que dia maravilhoso, cheio de sol e alegria!",
+    "Hoje me senti muito triste e desanimado.",
+    "O livro é muito bom, a história me prendeu do início ao fim.",
+    "Não gostei nada daquele restaurante, a comida era sem graça.",
+    "Recebi ótimas notícias hoje, estou muito feliz!",
+    "Infelizmente, o evento foi cancelado."
 ]
-categorias_originais = ["tecnologia", "esportes", "política", "tecnologia", "esportes", "política"]
-
+categorias_originais = ["positivo", "negativo", "positivo", "negativo", "positivo", "negativo", "positivo", "negativo", "positivo", "negativo"]
 # Combine os textos e categorias originais para facilitar a impressão
 dados_combinados = list(zip(textos_originais, categorias_originais))
 
 # Convertendo textos em uma matriz de contagens de tokens
 vectorizer = CountVectorizer()
 X = vectorizer.fit_transform([texto for texto, categoria in dados_combinados])
+
+# Imprimindo o vocabulário numerado
+print("\n" + "="*30 + "\n")
+print("Vocabulário do CountVectorizer:")
+vocabulario = vectorizer.vocabulary_
+vocabulario_numerado = sorted(vocabulario.items(), key=lambda item: item[1])
+for indice, (palavra, _) in enumerate(vocabulario_numerado):
+    print(f"{indice + 1}: {palavra}")
+print("\n" + "="*30 + "\n")
 
 # Dividindo os dados em conjuntos de treinamento e teste
 indices = list(range(len(dados_combinados)))
