@@ -1,2 +1,2 @@
 import tensorflow as tf
-print("GPUs disponíveis:", tf.config.list_physical_devices('GPU'))
+print("GPUs disponiveis:", tf.config.list_physical_devices('GPU'))
