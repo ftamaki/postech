@@ -1,0 +1,9 @@
+pandas
+# numpy
+scikit-learn
+deap
+ipykernel
+transformers
+matplotlib
+seaborn
+#tensorflow # ou torch, dependendo da sua escolha para o backend do transformers
