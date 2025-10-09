@@ -2,8 +2,9 @@ pandas
 # numpy
 scikit-learn
 deap
-ipykernel
+#ipykernel
 transformers
 matplotlib
 seaborn
+medmnist
 #tensorflow # ou torch, dependendo da sua escolha para o backend do transformers
