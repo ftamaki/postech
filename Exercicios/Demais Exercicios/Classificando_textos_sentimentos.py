@@ -18,7 +18,7 @@ textos_originais = [
     "A palestra foi muito interessante e informativa.",
     "O atendimento ao cliente foi péssimo, não resolveram meu problema."
 ]
-categorias_originais = ["positivo", "negativo", "positivo", "negativo", "positivo", "negativo", "positivo", "negativo", "positivo", "negativo", "positivo"]
+categorias_originais = ["positivo", "negativo", "positivo", "negativo", "positivo", "negativo", "positivo", "negativo", "positivo", "negativo", "positivo", "negativo"]
 # Combine os textos e categorias originais para facilitar a impressão
 dados_combinados = list(zip(textos_originais, categorias_originais))
 
