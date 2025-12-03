@@ -1,0 +1,39 @@
+# Protocolo Clínico: Manejo de Crise Hipertensiva
+
+## 1. Definição
+Crise hipertensiva é uma elevação aguda e grave da pressão arterial (PA), geralmente com PA sistólica > 180 mmHg e/ou PA diastólica > 120 mmHg. É classificada em Urgência Hipertensiva (sem lesão de órgão-alvo) e Emergência Hipertensiva (com lesão de órgão-alvo aguda).
+
+## 2. Urgência Hipertensiva (UH)
+- **Conduta:** Redução gradual da PA em 24-48 horas.
+- **Medicação Oral:** Captopril (25-50 mg), Clonidina (0.1-0.2 mg), ou Anlodipino (5-10 mg).
+- **Objetivo:** Reduzir a PA para < 160/100 mmHg nas primeiras 24 horas.
+- **Monitoramento:** Ambulatorial, com reavaliação em 24 horas.
+
+## 3. Emergência Hipertensiva (EH)
+- **Conduta:** Redução imediata da PA (em minutos a horas) com medicação intravenosa.
+- **Objetivo:** Reduzir a PA média em no máximo 25% na primeira hora.
+- **Medicação IV:** Nitroprussiato de Sódio, Labetalol ou Nicardipino. A escolha depende do órgão-alvo afetado (ex: Labetalol para dissecção aórtica).
+- **Monitoramento:** Unidade de Terapia Intensiva (UTI).
+
+## 4. Alerta de Segurança
+**NUNCA** prescrever medicação intravenosa fora de ambiente de UTI ou emergência. A redução abrupta da PA pode causar isquemia cerebral ou miocárdica.
+
+# Protocolo de Exames: Pacientes com Suspeita de Sepse
+
+## 1. Critérios de Rastreio (qSOFA)
+- Alteração do estado mental (Glasgow < 15)
+- Frequência respiratória ≥ 22 irpm
+- Pressão arterial sistólica ≤ 100 mmHg
+
+## 2. Exames Iniciais (Pacientes qSOFA positivo)
+- Hemocultura (antes da antibioticoterapia)
+- Lactato sérico
+- Hemograma completo
+- Função renal e hepática
+- Gasometria arterial (se necessário)
+
+## 3. Conduta
+- Iniciar antibioticoterapia de amplo espectro em até 1 hora.
+- Reposição volêmica com cristaloides (30 ml/kg) em 3 horas.
+- Monitorar débito urinário e lactato.
+`x
