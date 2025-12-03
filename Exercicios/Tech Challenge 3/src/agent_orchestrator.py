@@ -15,17 +15,15 @@ from langchain_community.vectorstores import FAISS
 from langchain_text_splitters import CharacterTextSplitter
 from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 
-# LangGraph
+# LangGraph (nova API)
 from langgraph.graph import StateGraph, END
 
-# Adiciona o diretório raiz do projeto ao sys.path para que as importações locais funcionem
-# quando o script é executado diretamente.
+# Local Tools
 current_dir = Path(__file__).resolve().parent
 project_root = current_dir.parent
 if str(project_root) not in sys.path:
     sys.path.append(str(project_root))
 
-# Local Tools
 from src.db_simulado import consultar_paciente
 
 
@@ -101,12 +99,6 @@ rag_chain = create_rag_chain(rag_retriever)
 
 @tool
 def consultar_protocolo(pergunta: str) -> str:
-    """
-    Consulta a base de conhecimento de Protocolos Médicos (RAG) para obter informações
-    sobre condutas clínicas, diagnósticos e tratamentos padronizados.
-    Use esta ferramenta quando a pergunta for sobre um protocolo médico geral,
-    e não sobre um paciente específico.
-    """
     return rag_chain.invoke(pergunta)
 
 
@@ -147,12 +139,10 @@ def agente_node(state: AgentState) -> AgentState:
 
         # Decide se deve usar ferramenta
         if "paciente" in user_text.lower() or "p00" in user_text.lower():
-            # Acessa a função subjacente da Tool para evitar o erro de 'StructuredTool' object is not callable
-            result = TOOLS["consultar_paciente"].func(user_text)
+            result = TOOLS["consultar_paciente"](user_text)
             ai_msg = AIMessage(content=result)
         elif "conduta" in user_text.lower() or "protocolo" in user_text.lower():
-            # Acessa a função subjacente da Tool para evitar o erro de 'StructuredTool' object is not callable
-            result = TOOLS["consultar_protocolo"].func(user_text)
+            result = TOOLS["consultar_protocolo"](user_text)
             ai_msg = AIMessage(content=result)
         else:
             # resposta direta sem ferramenta

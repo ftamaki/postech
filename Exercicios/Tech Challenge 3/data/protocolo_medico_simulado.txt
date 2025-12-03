@@ -36,4 +36,3 @@ Crise hipertensiva é uma elevação aguda e grave da pressão arterial (PA), ge
 - Iniciar antibioticoterapia de amplo espectro em até 1 hora.
 - Reposição volêmica com cristaloides (30 ml/kg) em 3 horas.
 - Monitorar débito urinário e lactato.
-`x
