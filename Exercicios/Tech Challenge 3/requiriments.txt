@@ -1,0 +1,6 @@
+langchain
+pydantic
+faiss-cpu
+python-dotenv
+langchain-google-genai
+chromadb
