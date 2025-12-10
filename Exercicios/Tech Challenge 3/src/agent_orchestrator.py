@@ -99,8 +99,8 @@ rag_chain = create_rag_chain(rag_retriever)
 
 @tool
 def consultar_protocolo(pergunta: str) -> str:
+    """Consulta o protocolo médico simulado para responder perguntas sobre condutas e procedimentos médicos."""
     return rag_chain.invoke(pergunta)
-
 
 # =============================================================
 # 4. DEFINIÇÃO DO ESTADO DO AGENTE
@@ -139,10 +139,10 @@ def agente_node(state: AgentState) -> AgentState:
 
         # Decide se deve usar ferramenta
         if "paciente" in user_text.lower() or "p00" in user_text.lower():
-            result = TOOLS["consultar_paciente"](user_text)
+            result = TOOLS["consultar_protocolo"].invoke(user_text)
             ai_msg = AIMessage(content=result)
         elif "conduta" in user_text.lower() or "protocolo" in user_text.lower():
-            result = TOOLS["consultar_protocolo"](user_text)
+            result = TOOLS["consultar_protocolo"].invoke(user_text)
             ai_msg = AIMessage(content=result)
         else:
             # resposta direta sem ferramenta
