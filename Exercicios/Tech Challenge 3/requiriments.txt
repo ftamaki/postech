@@ -1,6 +1,24 @@
+# --- LangChain Core & Orchestration ---
 langchain
-pydantic
-faiss-cpu
-python-dotenv
+langchain-community
+langchain-core
+langgraph
+
+# --- Integrações de Modelos (LLMs) ---
 langchain-google-genai
+langchain-huggingface
+
+# --- Hugging Face & Local Models (Essencial para seu código) ---
+torch
+transformers
+peft
+accelerate
+bitsandbytes
+
+# --- Bancos Vetoriais (RAG) ---
+faiss-cpu
 chromadb
+
+# --- Utilitários ---
+python-dotenv
+pydantic
