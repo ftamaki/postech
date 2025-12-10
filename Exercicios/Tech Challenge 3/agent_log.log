@@ -1,0 +1,76 @@
+2025-12-02 23:54:04,592 - INFO - --- Novo Ciclo de Execução do Agente ---
+2025-12-02 23:55:41,815 - INFO - --- Novo Ciclo de Execução do Agente ---
+2025-12-02 23:55:48,286 - INFO - Loading faiss.
+2025-12-02 23:55:48,455 - INFO - Successfully loaded faiss.
+2025-12-02 23:55:48,487 - INFO - Nó 'agente' iniciado. Última mensagem: HumanMessage
+2025-12-02 23:55:48,487 - INFO - Entrada do Usuário: Qual a conduta para Urgência Hipertensiva e qual o objetivo de redução da PA?
+2025-12-02 23:55:48,487 - INFO - Decisão: Chamando ferramenta 'consultar_protocolo' (RAG)
+2025-12-03 00:00:33,560 - INFO - Saída do Nó: Resposta gerada (Tamanho: 3862 caracteres)
+2025-12-03 00:00:33,565 - INFO - Nó 'agente' iniciado. Última mensagem: HumanMessage
+2025-12-03 00:00:33,566 - INFO - Entrada do Usuário: Qual o status de alerta e o histórico médico do paciente P001?
+2025-12-03 00:00:33,566 - INFO - Decisão: Chamando ferramenta 'consultar_paciente'
+2025-12-03 00:00:33,567 - INFO - Saída do Nó: Resposta gerada (Tamanho: 105 caracteres)
+2025-12-03 00:00:33,569 - INFO - Nó 'agente' iniciado. Última mensagem: HumanMessage
+2025-12-03 00:00:33,569 - INFO - Entrada do Usuário: O paciente P002 está com pressão 195/110. Qual a conduta recomendada?
+2025-12-03 00:00:33,569 - INFO - Decisão: Chamando ferramenta 'consultar_paciente'
+2025-12-03 00:00:33,569 - INFO - Saída do Nó: Resposta gerada (Tamanho: 112 caracteres)
+2025-12-03 11:12:38,730 - INFO - --- Novo Ciclo de Execução do Agente ---
+2025-12-03 11:12:45,933 - INFO - Loading faiss.
+2025-12-03 11:12:46,003 - INFO - Successfully loaded faiss.
+2025-12-03 11:12:46,022 - INFO - Nó 'agente' iniciado. Última mensagem: HumanMessage
+2025-12-03 11:12:46,022 - INFO - Entrada do Usuário: Qual a conduta para Urgência Hipertensiva e qual o objetivo de redução da PA?
+2025-12-03 11:12:46,022 - INFO - Decisão: Chamando ferramenta 'consultar_protocolo' (RAG)
+2025-12-03 11:37:49,484 - INFO - Saída do Nó: Resposta gerada (Tamanho: 3861 caracteres)
+2025-12-03 11:37:49,488 - INFO - Nó 'agente' iniciado. Última mensagem: HumanMessage
+2025-12-03 11:37:49,489 - INFO - Entrada do Usuário: Qual o status de alerta e o histórico médico do paciente P001?
+2025-12-03 11:37:49,489 - INFO - Decisão: Chamando ferramenta 'consultar_paciente'
+2025-12-03 11:37:49,490 - INFO - Saída do Nó: Resposta gerada (Tamanho: 105 caracteres)
+2025-12-03 11:37:49,504 - INFO - Nó 'agente' iniciado. Última mensagem: HumanMessage
+2025-12-03 11:37:49,505 - INFO - Entrada do Usuário: O paciente P002 está com pressão 195/110. Qual a conduta recomendada?
+2025-12-03 11:37:49,506 - INFO - Decisão: Chamando ferramenta 'consultar_paciente'
+2025-12-03 11:37:49,508 - INFO - Saída do Nó: Resposta gerada (Tamanho: 112 caracteres)
+2025-12-07 22:02:18,241 - INFO - --- Novo Ciclo de Execução do Agente ---
+2025-12-07 22:02:24,720 - INFO - Loading faiss.
+2025-12-07 22:02:24,766 - INFO - Successfully loaded faiss.
+2025-12-07 22:02:24,780 - INFO - Nó 'agente' iniciado. Última mensagem: HumanMessage
+2025-12-07 22:02:24,780 - INFO - Entrada do Usuário: Qual a conduta para Urgência Hipertensiva e qual o objetivo de redução da PA?
+2025-12-07 22:02:24,780 - INFO - Decisão: Chamando ferramenta 'consultar_protocolo' (RAG)
+2025-12-07 22:11:10,505 - INFO - Saída do Nó: Resposta gerada (Tamanho: 3084 caracteres)
+2025-12-07 22:11:10,508 - INFO - Nó 'agente' iniciado. Última mensagem: HumanMessage
+2025-12-07 22:11:10,508 - INFO - Entrada do Usuário: Qual o status de alerta e o histórico médico do paciente P001?
+2025-12-07 22:11:10,508 - INFO - Decisão: Chamando ferramenta 'consultar_paciente'
+2025-12-07 22:11:10,508 - INFO - Saída do Nó: Resposta gerada (Tamanho: 105 caracteres)
+2025-12-07 22:11:10,509 - INFO - Nó 'agente' iniciado. Última mensagem: HumanMessage
+2025-12-07 22:11:10,509 - INFO - Entrada do Usuário: O paciente P002 está com pressão 195/110. Qual a conduta recomendada?
+2025-12-07 22:11:10,510 - INFO - Decisão: Chamando ferramenta 'consultar_paciente'
+2025-12-07 22:11:10,510 - INFO - Saída do Nó: Resposta gerada (Tamanho: 112 caracteres)
+2025-12-07 22:18:26,791 - INFO - --- Novo Ciclo de Execução do Agente ---
+2025-12-07 22:18:33,703 - INFO - Loading faiss.
+2025-12-07 22:18:33,763 - INFO - Successfully loaded faiss.
+2025-12-07 22:18:33,776 - INFO - Nó 'agente' iniciado. Última mensagem: HumanMessage
+2025-12-07 22:18:33,776 - INFO - Entrada do Usuário: Qual a conduta para Urgência Hipertensiva e qual o objetivo de redução da PA?
+2025-12-07 22:18:33,776 - INFO - Decisão: Chamando ferramenta 'consultar_protocolo' (RAG)
+2025-12-07 22:24:29,308 - INFO - Saída do Nó: Resposta gerada (Tamanho: 3812 caracteres)
+2025-12-07 22:24:29,310 - INFO - Nó 'agente' iniciado. Última mensagem: HumanMessage
+2025-12-07 22:24:29,310 - INFO - Entrada do Usuário: Qual o status de alerta e o histórico médico do paciente P001?
+2025-12-07 22:24:29,311 - INFO - Decisão: Chamando ferramenta 'consultar_paciente' com ID: P001
+2025-12-07 22:30:05,269 - INFO - Saída do Nó: Resposta gerada (Tamanho: 2179 caracteres)
+2025-12-07 22:30:05,271 - INFO - Nó 'agente' iniciado. Última mensagem: HumanMessage
+2025-12-07 22:30:05,272 - INFO - Entrada do Usuário: O paciente P002 está com pressão 195/110. Qual a conduta recomendada?
+2025-12-07 22:30:05,272 - INFO - Decisão: Chamando ferramenta 'consultar_paciente' com ID: P002
+2025-12-07 22:33:15,088 - INFO - Saída do Nó: Resposta gerada (Tamanho: 1580 caracteres)
+2025-12-07 22:43:28,831 - INFO - --- Novo Ciclo de Execução do Agente ---
+2025-12-07 22:43:59,142 - INFO - Loading faiss.
+2025-12-07 22:43:59,407 - INFO - Successfully loaded faiss.
+2025-12-07 22:43:59,533 - INFO - Nó 'agente' iniciado. Última mensagem: HumanMessage
+2025-12-07 22:43:59,541 - INFO - Entrada do Usuário: Qual a conduta para Urgência Hipertensiva e qual o objetivo de redução da PA?
+2025-12-07 22:43:59,545 - INFO - Decisão: Chamando ferramenta 'consultar_protocolo' (RAG)
+2025-12-07 22:50:21,358 - INFO - Saída do Nó: Resposta gerada (Tamanho: 3888 caracteres)
+2025-12-07 22:50:21,360 - INFO - Nó 'agente' iniciado. Última mensagem: HumanMessage
+2025-12-07 22:50:21,360 - INFO - Entrada do Usuário: Qual o status de alerta e o histórico médico do paciente P001?
+2025-12-07 22:50:21,360 - INFO - Decisão: Chamando ferramenta 'consultar_paciente' com ID: P001
+2025-12-07 22:53:28,029 - INFO - Saída do Nó: Resposta gerada (Tamanho: 2137 caracteres)
+2025-12-07 22:53:28,030 - INFO - Nó 'agente' iniciado. Última mensagem: HumanMessage
+2025-12-07 22:53:28,030 - INFO - Entrada do Usuário: O paciente P002 está com pressão 195/110. Qual a conduta recomendada?
+2025-12-07 22:53:28,031 - INFO - Decisão: Chamando ferramenta 'consultar_paciente' com ID: P002
+2025-12-07 22:56:34,721 - INFO - Saída do Nó: Resposta gerada (Tamanho: 2228 caracteres)
