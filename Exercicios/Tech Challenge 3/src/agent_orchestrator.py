@@ -1,76 +1,78 @@
-import os
-from dotenv import load_dotenv
-from pathlib import Path
+from dotenv import load_dotenv                              # Carrega variáveis de ambiente de um arquivo .env
+from pathlib import Path                                    # Manipulação de caminhos de arquivos
 import sys
 
-# LangChain Core
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnablePassthrough
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.tools import tool
-from langchain_core.messages import HumanMessage, AIMessage
+# LangChain Core - Componentes Básicos
+from langchain_core.prompts import ChatPromptTemplate       # Criação de prompts para chat, com suporte a múltiplas mensagens
+from langchain_core.runnables import RunnablePassthrough    # Passa a entrada diretamente para a saída sem modificação
+from langchain_core.output_parsers import StrOutputParser   # Analisa a saída como uma string simples
+from langchain_core.tools import tool                       # Decorador para definir ferramentas, ex: APIs ou funções utilitárias
+from langchain_core.messages import HumanMessage, AIMessage # Representações de mensagens feiitas por humanos e IAs
 
-# LangChain Components
-from langchain_community.vectorstores import FAISS
-from langchain_text_splitters import CharacterTextSplitter
-from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
+# LangChain Components - LLMs, Embeddings, VectorStores
+from langchain_community.vectorstores import FAISS          # FAISS é uma biblioteca para busca eficiente em grandes conjuntos de vetores - usada para recuperação de informações
+from langchain_text_splitters import CharacterTextSplitter  # Divide textos em pedaços menores com base em caracteres
+from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings # Integração com modelos e embeddings do Google Generative AI
 
-# LangGraph (nova API)
-from langgraph.graph import StateGraph, END
+# LangGraph (nova API) - Orquestração de Fluxos de Trabalho
+from langgraph.graph import StateGraph, END                 # Define grafos de estados para orquestração de fluxos de trabalho
 
-# Local Tools
-current_dir = Path(__file__).resolve().parent
-project_root = current_dir.parent
-if str(project_root) not in sys.path:
-    sys.path.append(str(project_root))
+# Local Tools - Importando a ferramenta de consulta ao banco de dados simulado
+current_dir = Path(__file__).resolve().parent               # Diretório atual do arquivo  
+project_root = current_dir.parent                           # Raiz do projeto (um nível acima)
+if str(project_root) not in sys.path:                       # Adiciona raiz do projeto ao sys.path se não estiver presente    
+    sys.path.append(str(project_root))                      # essa adição permite importar módulos do projeto
 
-from src.db_simulado import consultar_paciente
+from src.db_simulado import consultar_paciente              # Ferramenta para consultar o banco de dados simulado de pacientes
 
 
 # =============================================================
-# 1. Configuração Inicial
+# 1. Configuração Inicial - LLM e Embeddings
 # =============================================================
-load_dotenv()
+load_dotenv()                                              # Carrega variáveis de ambiente do arquivo .env
 
-GEMINI_MODEL = "gemini-2.5-flash"
-EMBEDDING_MODEL = "text-embedding-004"
+GEMINI_MODEL = "gemini-2.5-flash"                          # Modelo Gemini do Google
+EMBEDDING_MODEL = "text-embedding-004"                     # Modelo de Embeddings do Google
 print(f"\nUsando modelo Google Gemini: {GEMINI_MODEL}")
 
-LLM = ChatGoogleGenerativeAI(model=GEMINI_MODEL, temperature=0.1)
-EMBEDDINGS = GoogleGenerativeAIEmbeddings(model=EMBEDDING_MODEL)
-
+LLM = ChatGoogleGenerativeAI(model=GEMINI_MODEL, temperature=0.1)           # Instancia o LLM com o modelo especificado, temperatura baixa para respostas mais precisas
+EMBEDDINGS = GoogleGenerativeAIEmbeddings(model=EMBEDDING_MODEL)            # Instancia o gerador de embeddings com o modelo especificado
+                                                                            # O gerador de embeddings converte texto em vetores numéricos para busca eficiente
 
 # =============================================================
-# 2. Configuração do RAG
+# 2. Configuração do RAG que quer dizer Retrieval-Augmented Generation
+#    Em resumo, é uma técnica que combina recuperação de informações com geração de texto.
 # =============================================================
-def setup_rag_retriever(protocol_path: str = "data/protocolo_medico_simulado.txt"):
-    base_dir = Path(__file__).resolve().parent
-    absolute_path = base_dir.parent / protocol_path
+def setup_rag_retriever(protocol_path: str = "data/protocolo_medico_simulado.txt"): # Configura o sistema RAG usando protocolos médicos simulados
+    base_dir = Path(__file__).resolve().parent                                      # Diretório atual do arquivo
+    absolute_path = base_dir.parent / protocol_path                                 # Caminho absoluto para o arquivo de protocolos médicos
 
-    with open(absolute_path, "r", encoding="utf-8") as f:
-        protocolo = f.read()
+    with open(absolute_path, "r", encoding="utf-8") as f:                           # Lê o conteúdo do arquivo de protocolos médicos
+        protocolo = f.read()                                                        # Armazena o conteúdo do protocolo em uma variável
 
-    text_splitter = CharacterTextSplitter(
-        separator="\n\n",
-        chunk_size=1000,
-        chunk_overlap=200,
-        length_function=len,
-        is_separator_regex=False,
+    text_splitter = CharacterTextSplitter(                                          # Configura o divisor de texto para dividir o protocolo em pedaços menores
+        separator="\n\n",                                                           # separa por duplas quebras de linha - conforme o arquivo protocolo_medico_simulado.txt
+        chunk_size=1000,                                                            # tamanho máximo de cada pedaço
+        chunk_overlap=200,                                                          # sobreposição entre pedaços para manter contexto
+        length_function=len,                                                        # função para medir o comprimento do texto
+        is_separator_regex=False,                                                   # o separador não é uma expressão regular
     )
 
-    texts = text_splitter.split_text(protocolo)
+    texts = text_splitter.split_text(protocolo)                                     # Divide o protocolo em pedaços menores     
 
-    vectorstore = FAISS.from_texts(texts, EMBEDDINGS)
+    vectorstore = FAISS.from_texts(texts, EMBEDDINGS)                               # Cria um índice FAISS a partir dos pedaços de texto e seus embeddings
     return vectorstore.as_retriever()
 
 
-rag_retriever = setup_rag_retriever()
+rag_retriever = setup_rag_retriever()                                               # Configura o recuperador RAG usando o protocolo médico simulado
 
 
 # =============================================================
-# 3. Criação da Tool RAG
+# 3. Criação da Tool RAG - Consulta ao Protocolo Médico Simulado
+#   @tool é um decorador que transforma a função em uma ferramenta utilizável pelo agente.
+#   Tool Rag é uma ferramenta que utiliza recuperação de informações para responder perguntas com base em um conjunto de dados específico.
 # =============================================================
-def create_rag_chain(retriever):
+def create_rag_chain(retriever):                        # Cria uma cadeia RAG para responder perguntas usando o recuperador fornecido
     template = """
     Você é um assistente médico. Use o contexto fornecido (Protocolos Médicos)
     para responder à pergunta. Não invente informações.
@@ -81,40 +83,43 @@ def create_rag_chain(retriever):
     Pergunta: {question}
 
     Resposta:
-    """
+    """ 
+    # Prompt template para a cadeia RAG, orientando o LLM a usar o contexto recuperado para responder perguntas
 
-    prompt = ChatPromptTemplate.from_template(template)
+    prompt = ChatPromptTemplate.from_template(template) # Cria o prompt de chat a partir do template definido, substituindo os placeholders {context} e {question}
 
-    chain = (
-        {"context": retriever, "question": RunnablePassthrough()}
-        | prompt
-        | LLM
-        | StrOutputParser()
+    chain = (                                                       # chain serve para encadear múltiplos componentes juntos facilitando o fluxo de dados entre eles
+        {"context": retriever, "question": RunnablePassthrough()}   # mapeia o contexto para o recuperador e a pergunta para a entrada direta
+        | prompt                                                    # Gera o prompt formatado
+        | LLM                                                       # Passa o prompt para o LLM para gerar a resposta
+        | StrOutputParser()                                         # Analisa a saída do LLM como uma string simples                              
     )
-    return chain
+    return chain                                                    # Retorna a cadeia RAG criada
 
 
-rag_chain = create_rag_chain(rag_retriever)
+rag_chain = create_rag_chain(rag_retriever)                         # Cria a cadeia RAG usando o recuperador configurado
 
 
-@tool
-def consultar_protocolo(pergunta: str) -> str:
-    """Consulta o protocolo médico simulado para responder perguntas sobre condutas e procedimentos médicos."""
-    return rag_chain.invoke(pergunta)
-
-# =============================================================
-# 4. DEFINIÇÃO DO ESTADO DO AGENTE
-# =============================================================
-class AgentState(dict):
-    messages: list
-
+@tool                                                               # Decorador que transforma a função em uma ferramenta utilizável pelo agente do RAG
+def consultar_protocolo(pergunta: str) -> str:                      # consultar_protocolo é uma ferramenta que usa RAG para responder perguntas sobre protocolos médicos
+    """Consulta o protocolo médico simulado para responder perguntas sobre condutas e procedimentos médicos.""" # Docstring explicativa da função
+    return rag_chain.invoke(pergunta)                               # Invoca a cadeia RAG com a pergunta fornecida e retorna a resposta 
 
 # =============================================================
-# 5. NÓ PRINCIPAL DO AGENTE
+# 4. DEFINIÇÃO DO ESTADO DO AGENTE - estrutura de dados para armazenar o estado do agente
+#   essa parte define como o agente mantém o contexto da conversa
 # =============================================================
-TOOLS = {
-    "consultar_protocolo": consultar_protocolo,
-    "consultar_paciente": consultar_paciente,
+class AgentState(dict): # Define o estado do agente como um dicionário
+    messages: list      # Lista de mensagens trocadas entre o humano e o agente
+
+
+# =============================================================
+# 5. NÓ PRINCIPAL DO AGENTE - lógica do agente para decidir quando e qual ferramenta usar
+#   essa parte define o comportamento do agente
+# =============================================================
+TOOLS = { # Dicionário de ferramentas disponíveis para o agente
+    "consultar_protocolo": consultar_protocolo, # Ferramenta para consultar protocolos médicos
+    "consultar_paciente": consultar_paciente,   # Ferramenta para consultar dados de pacientes
 }
 
 SYSTEM_PROMPT = """
@@ -127,11 +132,11 @@ Regras:
 - Se a pergunta for sobre um paciente, use consultar_paciente.
 - Se for sobre protocolos médicos, use consultar_protocolo.
 - Se nenhuma ferramenta for necessária, responda diretamente.
-"""
+""" # Prompt do sistema definindo o comportamento e as regras do agente, incluindo as ferramentas disponíveis
 
 
-def agente_node(state: AgentState) -> AgentState:
-    last = state["messages"][-1]
+def agente_node(state: AgentState) -> AgentState:   # Função que define o comportamento do agente em um nó do grafo, grafo que é usado para orquestrar o fluxo de trabalho
+    last = state["messages"][-1]                    # Obtém a última mensagem da conversa
 
     # Se o último for mensagem do humano, pedir análise ao LLM
     if isinstance(last, HumanMessage):
