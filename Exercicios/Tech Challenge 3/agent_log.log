@@ -74,3 +74,6 @@
 2025-12-07 22:53:28,030 - INFO - Entrada do Usuário: O paciente P002 está com pressão 195/110. Qual a conduta recomendada?
 2025-12-07 22:53:28,031 - INFO - Decisão: Chamando ferramenta 'consultar_paciente' com ID: P002
 2025-12-07 22:56:34,721 - INFO - Saída do Nó: Resposta gerada (Tamanho: 2228 caracteres)
+2025-12-10 00:05:08,459 - INFO - --- Novo Ciclo de Execução do Agente ---
+2025-12-10 00:05:17,998 - INFO - Loading faiss.
+2025-12-10 00:05:18,039 - INFO - Successfully loaded faiss.
