@@ -18,12 +18,11 @@ from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmb
 from langgraph.graph import StateGraph, END                 # Define grafos de estados para orquestração de fluxos de trabalho
 
 # Local Tools - Importando a ferramenta de consulta ao banco de dados simulado
-current_dir = Path(__file__).resolve().parent               # Diretório atual do arquivo  
-project_root = current_dir.parent                           # Raiz do projeto (um nível acima)
-if str(project_root) not in sys.path:                       # Adiciona raiz do projeto ao sys.path se não estiver presente    
-    sys.path.append(str(project_root))                      # essa adição permite importar módulos do projeto
+current_dir = Path(__file__).resolve().parent               # Diretório atual do arquivo (/home/ubuntu)
+if str(current_dir) not in sys.path:                       # Adiciona o diretório atual ao sys.path
+    sys.path.append(str(current_dir))                      # isso permite importar módulos de subdiretórios como 'src'
 
-from src.db_simulado import consultar_paciente              # Ferramenta para consultar o banco de dados simulado de pacientes
+from db_simulado import consultar_paciente as consultar_paciente_db            # Ferramenta para consultar o banco de dados simulado de pacientes
 
 
 # =============================================================
@@ -105,6 +104,22 @@ def consultar_protocolo(pergunta: str) -> str:                      # consultar_
     """Consulta o protocolo médico simulado para responder perguntas sobre condutas e procedimentos médicos.""" # Docstring explicativa da função
     return rag_chain.invoke(pergunta)                               # Invoca a cadeia RAG com a pergunta fornecida e retorna a resposta 
 
+@tool
+def consultar_paciente_tool(pergunta: str) -> str:
+    """
+    Consulta o banco de dados simulado de pacientes para obter informações como
+    status de alerta, histórico médico e dados vitais.
+    A pergunta deve ser formatada para que a ferramenta `consultar_paciente`
+    possa extrair o ID do paciente (ex: P001).
+    """
+    # A função `consultar_paciente` (importada de src.db_simulado) é a implementação real.
+    # Aqui, você pode adicionar lógica para extrair o ID do paciente da `pergunta`
+    # antes de chamar a função real, mas por simplicidade, vamos passar a pergunta
+    # diretamente para a função simulada, que deve ser capaz de extrair o ID.
+    return consultar_paciente_db(pergunta)
+
+
+
 # =============================================================
 # 4. DEFINIÇÃO DO ESTADO DO AGENTE - estrutura de dados para armazenar o estado do agente
 #   essa parte define como o agente mantém o contexto da conversa
@@ -119,7 +134,7 @@ class AgentState(dict): # Define o estado do agente como um dicionário
 # =============================================================
 TOOLS = { # Dicionário de ferramentas disponíveis para o agente
     "consultar_protocolo": consultar_protocolo, # Ferramenta para consultar protocolos médicos
-    "consultar_paciente": consultar_paciente,   # Ferramenta para consultar dados de pacientes
+    "consultar_paciente": consultar_paciente_tool,   # Ferramenta para consultar dados de pacientes
 }
 
 SYSTEM_PROMPT = """
@@ -139,14 +154,14 @@ def agente_node(state: AgentState) -> AgentState:   # Função que define o comp
     last = state["messages"][-1]                    # Obtém a última mensagem da conversa
 
     # Se o último for mensagem do humano, pedir análise ao LLM
-    if isinstance(last, HumanMessage):
-        user_text = last.content
+    if isinstance(last, HumanMessage):              # Verifica se a última mensagem foi enviada pelo usuário (humano)
+        user_text = last.content                    # Extrai o conteúdo da mensagem enviada pelo usuário
 
-        # Decide se deve usar ferramenta
-        if "paciente" in user_text.lower() or "p00" in user_text.lower():
-            result = TOOLS["consultar_protocolo"].invoke(user_text)
-            ai_msg = AIMessage(content=result)
-        elif "conduta" in user_text.lower() or "protocolo" in user_text.lower():
+        # Decide se deve usar ferramenta, e qual usar
+        if "paciente" in user_text.lower() or "p00" in user_text.lower():   # Verifica se a mensagem contém termos relacionados a pacientes
+            result = TOOLS["consultar_paciente"].invoke(user_text)          # Usa a ferramenta consultar_paciente para responder à pergunta
+            ai_msg = AIMessage(content=result)                      
+        elif "conduta" in user_text.lower() or "protocolo" in user_text.lower() or "protocolos" in user_text.lower():
             result = TOOLS["consultar_protocolo"].invoke(user_text)
             ai_msg = AIMessage(content=result)
         else:
