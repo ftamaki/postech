@@ -75,7 +75,8 @@ def setup_rag_retriever(protocol_path: str = "data/protocolo_medico_simulado.txt
     texts = text_splitter.split_text(protocolo)                                     # Divide o protocolo em pedaços menores     
 
     vectorstore = FAISS.from_texts(texts, EMBEDDINGS)                               # Cria um índice FAISS a partir dos pedaços de texto e seus embeddings
-    return vectorstore.as_retriever()
+    return vectorstore.as_retriever()                                               # Retorna um recuperador que pode buscar informações relevantes no índice FAISS
+                                                                                    # FAISS quer dizer Facebook AI Similarity Search, é uma biblioteca eficiente para busca em grandes conjuntos de vetores
 
 
 rag_retriever = setup_rag_retriever()                                               # Configura o recuperador RAG usando o protocolo médico simulado
