@@ -1,3 +1,16 @@
+# agent_orchestrator.py
+# Script para orquestração de um agente médico de IA usando LangChain e LangGraph
+# Integra ferramentas para consulta a protocolos médicos simulados e banco de dados simulado de pacientes
+# dividido em 8 partes principais:
+# 1. Configuração Inicial - LLM e Embeddings, configuração do modelo de linguagem e embeddings do Google Generative AI
+# 2. Configuração do RAG (Retrieval-Augmented Generation), sistema que combina recuperação de informações com geração de texto
+# 3. Criação da Tool RAG - Consulta ao Protocolo Médico Simulado, ferramenta que utiliza RAG para responder perguntas sobre protocolos médicos
+# 4. Definição do Estado do Agente, estrutura de dados para armazenar o estado do agente
+# 5. Nó Principal do Agente, aqui o agente decide qual ferramenta usar
+# 6. Montagem do Grafo - Grafo serve para orquestrar o fluxo de trabalho do agente
+# 7. Função Principal de Execução, roda o agente com uma entrada do usuário
+# 8. Testes e resultado final, executa o agente com perguntas de teste
+
 from dotenv import load_dotenv                              # Carrega variáveis de ambiente de um arquivo .env
 from pathlib import Path                                    # Manipulação de caminhos de arquivos
 import sys
@@ -30,8 +43,8 @@ from db_simulado import consultar_paciente as consultar_paciente_db            #
 # =============================================================
 load_dotenv()                                              # Carrega variáveis de ambiente do arquivo .env
 
-GEMINI_MODEL = "gemini-2.5-flash"                          # Modelo Gemini do Google
-EMBEDDING_MODEL = "text-embedding-004"                     # Modelo de Embeddings do Google
+GEMINI_MODEL = "gemini-2.5-flash"                          # Modelo Gemini do Google, esse é o modelo carregado para o LLM
+EMBEDDING_MODEL = "text-embedding-004"                     # Modelo de Embeddings do Google, embeddings são representações vetoriais de texto usadas para busca e similaridade
 print(f"\nUsando modelo Google Gemini: {GEMINI_MODEL}")
 
 LLM = ChatGoogleGenerativeAI(model=GEMINI_MODEL, temperature=0.1)           # Instancia o LLM com o modelo especificado, temperatura baixa para respostas mais precisas
@@ -41,6 +54,8 @@ EMBEDDINGS = GoogleGenerativeAIEmbeddings(model=EMBEDDING_MODEL)            # In
 # =============================================================
 # 2. Configuração do RAG que quer dizer Retrieval-Augmented Generation
 #    Em resumo, é uma técnica que combina recuperação de informações com geração de texto.
+#    O sistema RAG permite que o modelo de linguagem acesse informações externas (como documentos ou bases de dados)
+#    para melhorar a precisão e relevância das respostas geradas.
 # =============================================================
 def setup_rag_retriever(protocol_path: str = "data/protocolo_medico_simulado.txt"): # Configura o sistema RAG usando protocolos médicos simulados
     base_dir = Path(__file__).resolve().parent                                      # Diretório atual do arquivo
@@ -160,52 +175,55 @@ def agente_node(state: AgentState) -> AgentState:   # Função que define o comp
         # Decide se deve usar ferramenta, e qual usar
         if "paciente" in user_text.lower() or "p00" in user_text.lower():   # Verifica se a mensagem contém termos relacionados a pacientes
             result = TOOLS["consultar_paciente"].invoke(user_text)          # Usa a ferramenta consultar_paciente para responder à pergunta
-            ai_msg = AIMessage(content=result)                      
-        elif "conduta" in user_text.lower() or "protocolo" in user_text.lower() or "protocolos" in user_text.lower():
-            result = TOOLS["consultar_protocolo"].invoke(user_text)
-            ai_msg = AIMessage(content=result)
-        else:
+            ai_msg = AIMessage(content=result)                              # Cria uma mensagem de IA com o resultado obtido, para ser adicionada ao estado                          
+        elif "conduta" in user_text.lower() or "protocolo" in user_text.lower() or "protocolos" in user_text.lower(): # Verifica se a mensagem contém termos relacionados a protocolos médicos
+            result = TOOLS["consultar_protocolo"].invoke(user_text)         # Usa a ferramenta consultar_protocolo para responder à pergunta
+            ai_msg = AIMessage(content=result)                              # Cria uma mensagem de IA com o resultado obtido, para ser adicionada ao estado   
+        else:                                                               
             # resposta direta sem ferramenta
-            result = LLM.invoke([HumanMessage(content=user_text)])
-            ai_msg = result
+            result = LLM.invoke([HumanMessage(content=user_text)])          # Invoca o LLM diretamente para responder à pergunta sem usar ferramentas
+            ai_msg = result                                                 # Usa a resposta gerada pelo LLM como a mensagem de IA             
 
-        return {"messages": state["messages"] + [ai_msg]}
+        return {"messages": state["messages"] + [ai_msg]}                   # Atualiza o estado adicionando a nova mensagem de IA à lista de mensagens  
 
-    return state
-
-
-# =============================================================
-# 6. MONTAGEM DO GRAFO
-# =============================================================
-workflow = StateGraph(AgentState)
-workflow.add_node("agente", agente_node)
-workflow.set_entry_point("agente")
-workflow.add_edge("agente", END)
-
-agent_app = workflow.compile()
+    return state                                                            # Se a última mensagem não for do usuário, retorna o estado inalterado
 
 
 # =============================================================
-# 7. Função principal de execução
+# 6. MONTAGEM DO GRAFO - orquestração do fluxo de trabalho do agente
+#  essa parte monta o grafo de estados que define o fluxo do agente, usando o nó definido acima
 # =============================================================
-def run_agent(user_input: str):
-    initial = {"messages": [HumanMessage(content=user_input)]}
-    result = agent_app.invoke(initial)
-    return result["messages"][-1].content
+workflow = StateGraph(AgentState)               # Cria um grafo de estados para orquestrar o fluxo de trabalho do agente, grafo é baseado na classe AgentState
+workflow.add_node("agente", agente_node)        # Adiciona o nó principal do agente ao grafo, associando-o à função agente_node
+workflow.set_entry_point("agente")              # Define o ponto de entrada do grafo como o nó do agente
+workflow.add_edge("agente", END)                # Adiciona uma aresta do nó do agente para o estado final (END), indicando que o fluxo termina após o agente processar a entrada
+
+agent_app = workflow.compile()                  # Compila o grafo em uma aplicação executável que pode ser invocada com entradas específicas
 
 
 # =============================================================
-# 8. Testes
+# 7. Função principal de execução - roda o agente com uma entrada do usuário
+# essa parte define uma função para executar o agente com uma pergunta do usuário
 # =============================================================
-if __name__ == "__main__":
-    print("\n===== TESTE 1: PROTOCOLO =====")
-    q1 = "Qual a conduta para Urgência Hipertensiva e qual o objetivo de redução da PA?"
-    print(run_agent(q1))
+def run_agent(user_input: str):                                     # Função para executar o agente com uma entrada do usuário
+    initial = {"messages": [HumanMessage(content=user_input)]}      # Inicializa o estado com a mensagem do usuário
+    result = agent_app.invoke(initial)                              # Invoca a aplicação do agente com o estado inicial
+    return result["messages"][-1].content                           # Retorna o conteúdo da última mensagem gerada pelo agente
 
-    print("\n===== TESTE 2: PACIENTE =====")
-    q2 = "Qual o status de alerta e o histórico médico do paciente P001?"
-    print(run_agent(q2))
 
-    print("\n===== TESTE 3: MISTO =====")
-    q3 = "O paciente P002 está com pressão 195/110. Qual a conduta recomendada?"
-    print(run_agent(q3))
+# =============================================================
+# 8. Testes - Executa o agente com perguntas de teste
+# essa parte executa o agente com exemplos de perguntas para demonstrar seu funcionamento
+# =============================================================
+if __name__ == "__main__":      # Executa o bloco de código apenas se o script for executado diretamente
+    print("\n===== TESTE 1: PROTOCOLO =====") # Imprime o cabeçalho do teste 1
+    question1 = "Qual a conduta para Urgência Hipertensiva e qual o objetivo de redução da PA?" # Pergunta de teste sobre protocolos médicos
+    print(run_agent(question1)) # Executa o agente com a pergunta de teste 1 e imprime a resposta
+
+    print("\n===== TESTE 2: PACIENTE =====")    # Imprime o cabeçalho do teste 2
+    question2 = "Qual o status de alerta e o histórico médico do paciente P001?"    # Pergunta de teste sobre dados de pacientes, deve utilizar a ferramenta consultar_paciente um mock de banco de dados local
+    print(run_agent(question2)) 
+
+    print("\n===== TESTE 3: MISTO =====")       # Imprime o cabeçalho do teste 3
+    question3 = "O paciente P002 está com pressão 195/110. Qual a conduta recomendada?" # Pergunta de teste que mistura dados de paciente e protocolo médico
+    print(run_agent(question3))
