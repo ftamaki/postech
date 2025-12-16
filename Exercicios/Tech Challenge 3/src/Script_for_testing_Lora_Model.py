@@ -75,18 +75,17 @@ def testar_modelo_lora(adapter_path):
         print(f"\n--- Resposta do Modelo ---\n{resposta_gerada}\n--------------------------\n")
 
 if __name__ == "__main__":
-    # IMPORTANTE: Ajuste este caminho para onde a pasta 'med-assistant-lora' foi gerada
     # O código abaixo assume uma estrutura de projeto específica.
     
     # Obtém o diretório do script atual (src/)
     script_dir = Path(__file__).resolve().parent
-    # Sobe para a pasta Tech Challenge 3 (ajuste conforme sua estrutura)
+    # Sobe para a pasta Tech Challenge 3
     project_dir = script_dir.parent
     # Caminho para o modelo
-    model_path = project_dir / "fine_tuned_model" / "med-assistant-lora"
+    model_path = project_dir / "trained_data\/fine_tuned_model_lora" / "med-assistant-lora" 
     
     if model_path.exists():
         testar_modelo_lora(str(model_path))
     else:
         print(f"ERRO: Caminho não encontrado: {model_path}")
-        print(f"Verifique se a pasta 'med-assistant-lora' existe em: {project_dir / 'fine_tuned_model'}")
+        print(f"Verifique se a pasta 'med-assistant-lora' existe em: {project_dir / ''}")
