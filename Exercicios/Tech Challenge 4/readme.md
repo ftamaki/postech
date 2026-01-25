@@ -106,3 +106,8 @@ Vídeo de até 15 minutos demonstrando:
 
 ## Licença
 Uso acadêmico conforme orientações do curso/entidade.
+
+
+Dataset YOLO pronto em: C:\Users\flavio\VsCodeProjects\postech\data\yolo_endovis
+YAML: C:\Users\flavio\VsCodeProjects\postech\data\yolo_endovis\dataset.yaml
+Treino (exemplo): yolo detect train data=data/yolo_endovis/dataset.yaml model=yolov8n.pt imgsz=640
