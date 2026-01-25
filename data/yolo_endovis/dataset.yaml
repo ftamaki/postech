@@ -1,0 +1,5 @@
+path: C:\Users\flavio\VsCodeProjects\postech\data\yolo_endovis
+train: images/train
+val: images/val
+names:
+  0: instrument
