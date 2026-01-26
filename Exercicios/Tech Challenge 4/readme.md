@@ -111,3 +111,8 @@ Uso acadêmico conforme orientações do curso/entidade.
 Dataset YOLO pronto em: C:\Users\flavio\VsCodeProjects\postech\data\yolo_endovis
 YAML: C:\Users\flavio\VsCodeProjects\postech\data\yolo_endovis\dataset.yaml
 Treino (exemplo): yolo detect train data=data/yolo_endovis/dataset.yaml model=yolov8n.pt imgsz=640
+
+yolo detect train data=data/yolo_endovis/dataset.yaml model=yolov8n.pt imgsz=640 epochs=10
+
+Results saved to C:\Users\flavio\VsCodeProjects\postech\runs\detect\train
+C:\Users\flavio\VsCodeProjects\postech\Exercicios\Tech Challenge 4\scripts\runs\detect\train
