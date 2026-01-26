@@ -116,3 +116,10 @@ yolo detect train data=data/yolo_endovis/dataset.yaml model=yolov8n.pt imgsz=640
 
 Results saved to C:\Users\flavio\VsCodeProjects\postech\runs\detect\train
 C:\Users\flavio\VsCodeProjects\postech\Exercicios\Tech Challenge 4\scripts\runs\detect\train
+
+
+video gerado com make_sample_video_from_frames.py
+python -m src.video.run --video data/raw/sample.mp4 --weights models/yolo/best.pt --out docs/evidencias-video
+
+pip install azure-storage-blob
+
