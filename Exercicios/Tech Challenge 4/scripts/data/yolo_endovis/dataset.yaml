@@ -1,5 +1,0 @@
-path: C:\Users\flavio\VsCodeProjects\postech\Exercicios\Tech Challenge 4\scripts\data\yolo_endovis
-train: images/train
-val: images/val
-names:
-  0: instrument
