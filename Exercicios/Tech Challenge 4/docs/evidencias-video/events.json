@@ -1,6 +1,7 @@
 {
+  "run_id": "2026-01-26_231912Z",
   "video_id": "sample.mp4",
-  "created_at": "2026-01-26T23:02:54.357958Z",
+  "created_at": "2026-01-26T23:19:12.910452Z",
   "source": {
     "type": "local",
     "uri": "data/raw/sample.mp4"
