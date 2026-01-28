@@ -1,0 +1,65 @@
+{
+  "run_id": "2026-01-28_010910Z",
+  "audio_id": "sample.mp3",
+  "created_at": "2026-01-28T01:09:16.665228Z",
+  "source": {
+    "type": "local",
+    "uri": "sample.mp3"
+  },
+  "model": {
+    "name": "whisper-local",
+    "variant": "small",
+    "language": "pt"
+  },
+  "transcript": "Olá, doutora. Eu estou muito ansiosa, nervosa e preocupada. Tenho medo, fico apreensiva e às vezes sinto falta de ar e taque cardia. Depois que o bebê nasceu, eu não consigo dormir e estou exausta. Eu me sinto muito triste, desanimada e sem esperança. Eu chore e me sinto culpada, como se eu não aguento mais. Eu também me sinto incapaz de cuidar do bebê e não consigo criar vínculo. Está intenso e difícil todos os dias. Em casa, tenho medo dele. Ele me controla, grita e faz ameaças.",
+  "segments": [
+    {
+      "start": 0.0,
+      "end": 10.0,
+      "text": "Olá, doutora. Eu estou muito ansiosa, nervosa e preocupada. Tenho medo, fico apreensiva e às vezes sinto falta de ar e taque cardia."
+    },
+    {
+      "start": 10.0,
+      "end": 18.0,
+      "text": "Depois que o bebê nasceu, eu não consigo dormir e estou exausta. Eu me sinto muito triste, desanimada e sem esperança."
+    },
+    {
+      "start": 18.0,
+      "end": 28.0,
+      "text": "Eu chore e me sinto culpada, como se eu não aguento mais. Eu também me sinto incapaz de cuidar do bebê e não consigo criar vínculo."
+    },
+    {
+      "start": 28.0,
+      "end": 35.0,
+      "text": "Está intenso e difícil todos os dias. Em casa, tenho medo dele. Ele me controla, grita e faz ameaças."
+    }
+  ],
+  "risk_signals": [
+    {
+      "type": "anxiety_signal",
+      "severity": "high",
+      "reason": "Sinal de ansiedade (keywords: ansiosa, nervosa, apreensiva, preocupada, falta de ar, medo)"
+    },
+    {
+      "type": "depression_signal",
+      "severity": "high",
+      "reason": "Sinal de depressão / humor deprimido (keywords: triste, muito triste, sem esperança, desanimada, não aguento, culpa...)"
+    },
+    {
+      "type": "postpartum_signal",
+      "severity": "high",
+      "reason": "Sinal de risco pós-parto (triagem textual) (keywords: depois que o bebê nasceu, não consigo dormir, me sinto incapaz)"
+    },
+    {
+      "type": "domestic_violence_signal",
+      "severity": "high",
+      "reason": "Sinal de possível violência doméstica (keywords: ameaça, tenho medo dele, ele me controla)"
+    }
+  ],
+  "summary": {
+    "word_count": 89,
+    "char_count": 485,
+    "risk_signals_count": 4,
+    "max_severity": "high"
+  }
+}

@@ -10,8 +10,8 @@ from ultralytics import YOLO
 # =========================
 CLASS_NAME = "instrument"
 CONF_TH = 0.35
-FRAME_STRIDE = 5  # processa 1 a cada N frames
-RISK_PERSISTENCE_SEC = 8  # risco se persistir por >= X segundos
+FRAME_STRIDE = 5  # processa 1 a cada N frames (ajuste conforme performance)
+RISK_PERSISTENCE_SEC = 8  # "risco precoce" se instrumento persistir por >= X segundos
 
 
 def ensure_dir(p: Path):
@@ -23,17 +23,11 @@ def sec_from_frame(frame_idx: int, fps: float) -> float:
 
 
 def utc_run_id() -> str:
-    # ex.: 2026-01-26_235959Z
+    # Ex.: 2026-01-26_235959Z
     return datetime.now(timezone.utc).strftime("%Y-%m-%d_%H%M%SZ")
 
 
 def build_report(events: dict) -> str:
-    vid = events["video_id"]
-    created = events["created_at"]
-    det_count = events["summary"]["detections_count"]
-    risk_count = events["summary"]["risk_signals_count"]
-
-    # Severidade máxima (se houver)
     sev_order = {"low": 0, "medium": 1, "high": 2}
     max_sev = "low"
     for rs in events.get("risk_signals", []):
@@ -42,16 +36,21 @@ def build_report(events: dict) -> str:
             max_sev = s
 
     lines = []
-    lines.append(f"# Evidências — Análise de Vídeo (YOLOv8)")
+    lines.append("# Evidências — Análise de Vídeo (YOLOv8)")
     lines.append("")
-    lines.append(f"- **Vídeo:** `{vid}`")
-    lines.append(f"- **Gerado em (UTC):** {created}")
-    lines.append(f"- **Modelo:** {events['model']['name']} | weights: `{events['model']['weights']}` | conf_th={events['model']['conf_th']}")
-    lines.append(f"- **FPS:** {events['video_meta']['fps']:.2f} | stride: {events['video_meta']['frame_stride']} | frames: {events['video_meta']['total_frames']}")
+    lines.append(f"- Vídeo: `{events['video_id']}`")
+    lines.append(f"- Run ID (UTC): `{events['run_id']}`")
+    lines.append(f"- Gerado em (UTC): {events['created_at']}")
+    lines.append(
+        f"- Modelo: {events['model']['name']} | weights: `{events['model']['weights']}` | conf_th={events['model']['conf_th']}"
+    )
+    lines.append(
+        f"- FPS: {events['video_meta']['fps']:.2f} | stride: {events['video_meta']['frame_stride']} | frames: {events['video_meta']['total_frames']}"
+    )
     lines.append("")
     lines.append("## Sumário")
-    lines.append(f"- Detecções: **{det_count}**")
-    lines.append(f"- Sinais de risco: **{risk_count}**")
+    lines.append(f"- Detecções: **{events['summary']['detections_count']}**")
+    lines.append(f"- Sinais de risco: **{events['summary']['risk_signals_count']}**")
     lines.append(f"- Severidade máxima: **{max_sev}**")
     lines.append("")
     lines.append("## Sinais de risco (detecção precoce)")
@@ -60,13 +59,12 @@ def build_report(events: dict) -> str:
     else:
         for rs in events["risk_signals"]:
             lines.append(
-                f"- **{rs['severity']}** | {rs['reason']} | "
-                f"{rs['t_start']}s → {rs['t_end']}s"
+                f"- **{rs['severity']}** | {rs['reason']} | {rs['t_start']}s → {rs['t_end']}s"
             )
     lines.append("")
     lines.append("## Observações técnicas")
-    lines.append("- Este relatório é gerado por um MVP com regras simples de persistência temporal.")
-    lines.append("- A lógica pode ser evoluída para modelos temporais/etapas clínicas e thresholds calibrados por especialistas.")
+    lines.append("- Relatório gerado por um MVP com regras simples de persistência temporal.")
+    lines.append("- A lógica pode evoluir para modelos temporais/etapas clínicas e thresholds calibrados.")
     lines.append("")
     return "\n".join(lines)
 
@@ -116,14 +114,17 @@ def main(
             for b in r0.boxes:
                 conf = float(b.conf[0].item())
                 xyxy = b.xyxy[0].tolist()
-                detections.append({
-                    "t": round(t, 3),
-                    "cls": CLASS_NAME,
-                    "conf": round(conf, 4),
-                    "bbox_xyxy": [round(x, 2) for x in xyxy],
-                })
+                detections.append(
+                    {
+                        "t": round(t, 3),
+                        "cls": CLASS_NAME,
+                        "conf": round(conf, 4),
+                        "bbox_xyxy": [round(x, 2) for x in xyxy],
+                    }
+                )
                 has_any = True
 
+            # salva alguns frames anotados (amostra)
             if saved < 15:
                 annotated = r0.plot()
                 out_img = frames_dir / f"frame_{frame_idx:06d}.jpg"
@@ -139,6 +140,7 @@ def main(
 
     # =========================
     # Regra simples de "detecção precoce de riscos"
+    # Persistência: se houver presença contínua por >= X segundos (aproximação)
     # =========================
     risk_signals = []
     if presence_timestamps:
@@ -153,6 +155,7 @@ def main(
                 return "medium"
             return "low"
 
+        # tolerância para considerar "contínuo" dado o FRAME_STRIDE
         gap = (FRAME_STRIDE / fps) * 1.5
 
         for t in presence_timestamps[1:]:
@@ -163,27 +166,32 @@ def main(
             dur = prev - start
             sev = severity_by_duration(dur)
             if sev != "low":
-                risk_signals.append({
+                risk_signals.append(
+                    {
+                        "type": "early_risk",
+                        "severity": sev,
+                        "reason": f"Persistência de {CLASS_NAME} por ~{dur:.1f}s",
+                        "t_start": round(start, 3),
+                        "t_end": round(prev, 3),
+                    }
+                )
+
+            start = t
+            prev = t
+
+        # última janela
+        dur = prev - start
+        sev = severity_by_duration(dur)
+        if sev != "low":
+            risk_signals.append(
+                {
                     "type": "early_risk",
                     "severity": sev,
                     "reason": f"Persistência de {CLASS_NAME} por ~{dur:.1f}s",
                     "t_start": round(start, 3),
                     "t_end": round(prev, 3),
-                })
-
-            start = t
-            prev = t
-
-        dur = prev - start
-        sev = severity_by_duration(dur)
-        if sev != "low":
-            risk_signals.append({
-                "type": "early_risk",
-                "severity": sev,
-                "reason": f"Persistência de {CLASS_NAME} por ~{dur:.1f}s",
-                "t_start": round(start, 3),
-                "t_end": round(prev, 3),
-            })
+                }
+            )
 
     run_id = utc_run_id()
 
@@ -193,7 +201,11 @@ def main(
         "created_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "source": {"type": "local", "uri": video_path},
         "model": {"name": "yolov8", "weights": weights_path, "conf_th": CONF_TH},
-        "video_meta": {"fps": float(fps), "total_frames": total_frames, "frame_stride": FRAME_STRIDE},
+        "video_meta": {
+            "fps": float(fps),
+            "total_frames": total_frames,
+            "frame_stride": FRAME_STRIDE,
+        },
         "detections": detections,
         "risk_signals": risk_signals,
         "summary": {
@@ -204,11 +216,10 @@ def main(
 
     out_json = out_dir / "events.json"
     out_json.write_text(json.dumps(events, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"OK: {out_json}")
 
     out_report = out_dir / "report.md"
     out_report.write_text(build_report(events), encoding="utf-8")
-
-    print(f"OK: {out_json}")
     print(f"OK: {out_report}")
 
     if upload_azure:
@@ -228,10 +239,13 @@ def main(
 
 if __name__ == "__main__":
     import argparse
+
     ap = argparse.ArgumentParser()
     ap.add_argument("--video", required=True, help="Caminho do vídeo de entrada")
     ap.add_argument("--weights", required=True, help="Pesos YOLO (best.pt)")
     ap.add_argument("--out", default="docs/evidencias-video", help="Diretório de saída")
-    ap.add_argument("--upload-azure", action="store_true", help="Envia evidências para o Azure Blob")
+    ap.add_argument(
+        "--upload-azure", action="store_true", help="Envia evidências para o Azure Blob"
+    )
     args = ap.parse_args()
     main(args.video, args.weights, args.out, args.upload_azure)

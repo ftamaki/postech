@@ -123,3 +123,109 @@ python -m src.video.run --video data/raw/sample.mp4 --weights models/yolo/best.p
 
 pip install azure-storage-blob
 
+Site dos dados - dataset treino
+# https://huggingface.co/datasets/tyluan/Endovis2017/blob/main/README.md
+
+rodar script que copia a evidencia do treino
+python scripts/collect_training_evidence.py --run-dir "C:\Users\flavio\VsCodeProjects\postech\Exercicios\Tech Challenge 4\runs\detect\runs\yolo_instrument_endovis"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Tech Challenge 4 — Análise de Vídeo com YOLOv8 e Integração Azure
+
+## Visão geral
+Este repositório implementa um MVP para monitoramento preventivo baseado em análise de vídeo, usando detecção de objetos com YOLOv8 e armazenamento de evidências no Azure Blob Storage.
+
+O projeto foi estruturado para suportar:
+- Detecção de instrumentos em frames (classe única: `instrument`)
+- Geração de evidências (frames anotados + `events.json`)
+- Geração de sinais de risco precoce (baseline por persistência temporal)
+- Upload automatizado das evidências para Azure Blob (opcional via flag)
+
+## Objetivos do projeto
+- Detecção precoce de riscos (baseline via regras temporais sobre detecções)
+- Aplicação em contexto materno/ginecológico (recorte de uso em vídeos clínicos)
+- Uso de nuvem (Azure) para armazenamento e escalabilidade
+
+## Dataset (formato YOLO)
+O dataset de treino foi preparado no formato YOLO, com:
+- `images/train` e `images/val`
+- `labels/train` e `labels/val` (bounding boxes em formato YOLO)
+- `dataset.yaml` com a configuração do dataset
+
+Estrutura:
+data/yolo_endovis/
+images/
+train/
+val/
+labels/
+train/
+val/
+dataset.yaml
+
+
+Formato dos labels:
+<class_id> <x_center> <y_center> <width> <height>
+
+
+No MVP, usamos uma classe:
+- `0 = instrument`
+
+## Treinamento do YOLOv8
+O treinamento é feito a partir do modelo base `yolov8n.pt` (fine-tuning) e o peso final é copiado para:
+- `models/yolo/best.pt`
+
+Exemplo de execução via script:
+```powershell
+python scripts/train_yolo.py --project runs/detect --name yolo_instrument_endovis --epochs 20 --imgsz 640
+
+python -m src.video.run --video data/raw/sample.mp4 --weights yolov8n.pt --out docs/evidencias-video/compare/pretrained
+python -m src.video.run --video data/raw/sample.mp4 --weights models/yolo/best.pt --out docs/evidencias-video/compare/finetuned
+
+
+(postech-gpu) PS C:\Users\flavio\VsCodeProjects\postech\Exercicios\Tech Challenge 4> python scripts/summarize_events.py --events docs/evidencias-video/compare/pretrained/events.json
+File: docs\evidencias-video\compare\pretrained\events.json
+detections_count: 12
+risk_signals_count: 0
+avg_conf: 0.5090
+top5:
+  t=17.0 conf=0.7481 bbox=[3.22, 240.48, 300.49, 372.86]
+  t=16.5 conf=0.6964 bbox=[336.6, 8.08, 507.55, 254.9]
+  t=11.0 conf=0.6853 bbox=[4.29, 200.78, 223.17, 334.46]
+  t=6.0 conf=0.5663 bbox=[2.93, 128.08, 291.82, 303.88]
+  t=20.5 conf=0.5043 bbox=[316.05, 292.63, 509.32, 461.17]
+
+(postech-gpu) PS C:\Users\flavio\VsCodeProjects\postech\Exercicios\Tech Challenge 4> python scripts/summarize_events.py --events docs/evidencias-video/compare/finetuned/events.json
+File: docs\evidencias-video\compare\finetuned\events.json
+detections_count: 65
+risk_signals_count: 1
+avg_conf: 0.7626
+top5:
+  t=8.0 conf=0.9893 bbox=[292.9, 221.42, 507.75, 333.83]
+  t=27.0 conf=0.9832 bbox=[9.23, 202.78, 497.31, 510.71]
+  t=22.5 conf=0.9732 bbox=[1.91, 110.18, 315.84, 473.1]
+  t=15.5 conf=0.9684 bbox=[150.9, 158.25, 507.92, 471.2]
+  t=21.0 conf=0.9592 bbox=[3.42, 286.23, 273.96, 506.4]
+
+(postech-gpu) PS C:\Users\flavio\VsCodeProjects\postech\Exercicios\Tech Challenge 4> 
+
+
+choco install ffmpeg

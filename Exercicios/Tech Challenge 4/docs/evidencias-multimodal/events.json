@@ -1,0 +1,54 @@
+{
+  "run_id": "2026-01-28_013511Z",
+  "created_at": "2026-01-28T01:35:11.415472Z",
+  "sources": {
+    "video": {
+      "events_path": "docs/evidencias-video/events.json",
+      "run_id": "2026-01-27_021547Z",
+      "video_id": "sample.mp4"
+    },
+    "audio": {
+      "events_path": "docs/evidencias-audio/events.json",
+      "run_id": "2026-01-28_010910Z",
+      "audio_id": "sample.mp3"
+    }
+  },
+  "risk_signals": [
+    {
+      "modality": "audio",
+      "type": "anxiety_signal",
+      "severity": "high",
+      "reason": "Sinal de ansiedade (keywords: ansiosa, nervosa, apreensiva, preocupada, falta de ar, medo)"
+    },
+    {
+      "modality": "audio",
+      "type": "depression_signal",
+      "severity": "high",
+      "reason": "Sinal de depressão / humor deprimido (keywords: triste, muito triste, sem esperança, desanimada, não aguento, culpa...)"
+    },
+    {
+      "modality": "audio",
+      "type": "postpartum_signal",
+      "severity": "high",
+      "reason": "Sinal de risco pós-parto (triagem textual) (keywords: depois que o bebê nasceu, não consigo dormir, me sinto incapaz)"
+    },
+    {
+      "modality": "audio",
+      "type": "domestic_violence_signal",
+      "severity": "high",
+      "reason": "Sinal de possível violência doméstica (keywords: ameaça, tenho medo dele, ele me controla)"
+    },
+    {
+      "modality": "video",
+      "type": "early_risk",
+      "severity": "medium",
+      "reason": "Persistência de instrument por ~17.0s",
+      "t_start": 0.0,
+      "t_end": 17.0
+    }
+  ],
+  "summary": {
+    "risk_signals_count": 5,
+    "max_severity": "high"
+  }
+}

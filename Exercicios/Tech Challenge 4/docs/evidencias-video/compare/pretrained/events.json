@@ -1,0 +1,158 @@
+{
+  "run_id": "2026-01-27_012837Z",
+  "video_id": "sample.mp4",
+  "created_at": "2026-01-27T01:28:37.518334Z",
+  "source": {
+    "type": "local",
+    "uri": "data/raw/sample.mp4"
+  },
+  "model": {
+    "name": "yolov8",
+    "weights": "yolov8n.pt",
+    "conf_th": 0.35
+  },
+  "video_meta": {
+    "fps": 10.0,
+    "total_frames": 300,
+    "frame_stride": 5
+  },
+  "detections": [
+    {
+      "t": 2.0,
+      "cls": "instrument",
+      "conf": 0.4422,
+      "bbox_xyxy": [
+        10.36,
+        102.92,
+        503.27,
+        499.14
+      ]
+    },
+    {
+      "t": 6.0,
+      "cls": "instrument",
+      "conf": 0.5663,
+      "bbox_xyxy": [
+        2.93,
+        128.08,
+        291.82,
+        303.88
+      ]
+    },
+    {
+      "t": 11.0,
+      "cls": "instrument",
+      "conf": 0.6853,
+      "bbox_xyxy": [
+        4.29,
+        200.78,
+        223.17,
+        334.46
+      ]
+    },
+    {
+      "t": 16.0,
+      "cls": "instrument",
+      "conf": 0.4553,
+      "bbox_xyxy": [
+        10.29,
+        0.09,
+        505.3,
+        501.13
+      ]
+    },
+    {
+      "t": 16.5,
+      "cls": "instrument",
+      "conf": 0.6964,
+      "bbox_xyxy": [
+        336.6,
+        8.08,
+        507.55,
+        254.9
+      ]
+    },
+    {
+      "t": 17.0,
+      "cls": "instrument",
+      "conf": 0.7481,
+      "bbox_xyxy": [
+        3.22,
+        240.48,
+        300.49,
+        372.86
+      ]
+    },
+    {
+      "t": 17.5,
+      "cls": "instrument",
+      "conf": 0.434,
+      "bbox_xyxy": [
+        8.79,
+        13.41,
+        495.71,
+        500.15
+      ]
+    },
+    {
+      "t": 19.5,
+      "cls": "instrument",
+      "conf": 0.4229,
+      "bbox_xyxy": [
+        4.05,
+        295.56,
+        169.48,
+        356.13
+      ]
+    },
+    {
+      "t": 20.5,
+      "cls": "instrument",
+      "conf": 0.5043,
+      "bbox_xyxy": [
+        316.05,
+        292.63,
+        509.32,
+        461.17
+      ]
+    },
+    {
+      "t": 25.5,
+      "cls": "instrument",
+      "conf": 0.3853,
+      "bbox_xyxy": [
+        8.63,
+        17.64,
+        505.18,
+        500.66
+      ]
+    },
+    {
+      "t": 25.5,
+      "cls": "instrument",
+      "conf": 0.3552,
+      "bbox_xyxy": [
+        17.08,
+        306.58,
+        192.53,
+        409.95
+      ]
+    },
+    {
+      "t": 29.5,
+      "cls": "instrument",
+      "conf": 0.4127,
+      "bbox_xyxy": [
+        203.86,
+        219.54,
+        341.57,
+        429.76
+      ]
+    }
+  ],
+  "risk_signals": [],
+  "summary": {
+    "detections_count": 12,
+    "risk_signals_count": 0
+  }
+}
