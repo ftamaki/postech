@@ -1,0 +1,111 @@
+name: CI — Architecture Analyzer
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "Exercicios/Tech Challenge 5/architecture-analyzer/**"
+  pull_request:
+    branches: [main]
+    paths:
+      - "Exercicios/Tech Challenge 5/architecture-analyzer/**"
+
+defaults:
+  run:
+    working-directory: "Exercicios/Tech Challenge 5/architecture-analyzer"
+
+jobs:
+  test-upload-service:
+    name: Testes — upload-service
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependências
+        working-directory: "Exercicios/Tech Challenge 5/architecture-analyzer/upload-service"
+        run: pip install -r requirements.txt
+
+      - name: Executar testes
+        working-directory: "Exercicios/Tech Challenge 5/architecture-analyzer/upload-service"
+        run: pytest
+
+  test-processing-service:
+    name: Testes — processing-service
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependências
+        working-directory: "Exercicios/Tech Challenge 5/architecture-analyzer/processing-service"
+        run: pip install -r requirements.txt
+
+      - name: Executar testes
+        working-directory: "Exercicios/Tech Challenge 5/architecture-analyzer/processing-service"
+        run: pytest
+
+  test-reports-service:
+    name: Testes — reports-service
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependências
+        working-directory: "Exercicios/Tech Challenge 5/architecture-analyzer/reports-service"
+        run: pip install -r requirements.txt
+
+      - name: Executar testes
+        working-directory: "Exercicios/Tech Challenge 5/architecture-analyzer/reports-service"
+        run: pytest
+
+  build-images:
+    name: Build Docker Images
+    runs-on: ubuntu-latest
+    needs: [test-upload-service, test-processing-service, test-reports-service]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build api-gateway
+        uses: docker/build-push-action@v5
+        with:
+          context: "Exercicios/Tech Challenge 5/architecture-analyzer/api-gateway"
+          push: false
+          tags: arch-analyzer/api-gateway:latest
+
+      - name: Build upload-service
+        uses: docker/build-push-action@v5
+        with:
+          context: "Exercicios/Tech Challenge 5/architecture-analyzer/upload-service"
+          push: false
+          tags: arch-analyzer/upload-service:latest
+
+      - name: Build processing-service
+        uses: docker/build-push-action@v5
+        with:
+          context: "Exercicios/Tech Challenge 5/architecture-analyzer/processing-service"
+          push: false
+          tags: arch-analyzer/processing-service:latest
+
+      - name: Build reports-service
+        uses: docker/build-push-action@v5
+        with:
+          context: "Exercicios/Tech Challenge 5/architecture-analyzer/reports-service"
+          push: false
+          tags: arch-analyzer/reports-service:latest

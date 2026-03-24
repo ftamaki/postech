@@ -1,0 +1,165 @@
+version: "3.9"
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - arch_network
+
+  upload-db:
+    image: postgres:15-alpine
+    container_name: upload-db
+    environment:
+      POSTGRES_DB: upload_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - upload_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - arch_network
+
+  reports-db:
+    image: postgres:15-alpine
+    container_name: reports-db
+    environment:
+      POSTGRES_DB: reports_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - reports_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - arch_network
+
+  upload-service:
+    build:
+      context: ./upload-service
+      dockerfile: Dockerfile
+    container_name: upload-service
+    ports:
+      - "8001:8001"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@upload-db:5432/upload_db
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      UPLOADS_DIR: /uploads
+    depends_on:
+      upload-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - uploads_data:/uploads
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - arch_network
+
+  processing-service:
+    build:
+      context: ./processing-service
+      dockerfile: Dockerfile
+    container_name: processing-service
+    ports:
+      - "8002:8002"
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      REPORTS_SERVICE_URL: http://reports-service:8003
+      UPLOAD_SERVICE_URL: http://upload-service:8001
+      UPLOADS_DIR: /uploads
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      upload-service:
+        condition: service_healthy
+      reports-service:
+        condition: service_healthy
+    volumes:
+      - uploads_data:/uploads
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - arch_network
+
+  reports-service:
+    build:
+      context: ./reports-service
+      dockerfile: Dockerfile
+    container_name: reports-service
+    ports:
+      - "8003:8003"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@reports-db:5432/reports_db
+    depends_on:
+      reports-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - arch_network
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8000:8000"
+    environment:
+      UPLOAD_SERVICE_URL: http://upload-service:8001
+      REPORTS_SERVICE_URL: http://reports-service:8003
+    depends_on:
+      upload-service:
+        condition: service_healthy
+      reports-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - arch_network
+
+networks:
+  arch_network:
+    driver: bridge
+
+volumes:
+  upload_db_data:
+  reports_db_data:
+  uploads_data:
