@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     UPLOAD_SERVICE_URL: str = "http://upload-service:8001"
     UPLOADS_DIR: str = "/uploads"
     # Modelo Claude com suporte a visão e documentos
-    CLAUDE_MODEL: str = "claude-opus-4-6"
+    CLAUDE_MODEL: str = "claude-sonnet-4-6"
 
     class Config:
         env_file = ".env"

@@ -143,14 +143,12 @@ Deixar claro no código e documentação:
 
 ---
 
-## Sugestão de Stack
-
-> Adaptar conforme o time decidir.
+## Stack
 
 - **API Gateway**: FastAPI ou Node.js (Express)
 - **Fila assíncrona**: RabbitMQ ou AWS SQS ou Redis Streams
 - **IA**: Claude API (Anthropic) ou OpenAI Vision — multimodal para análise de imagem/PDF
-- **Banco de dados**: PostgreSQL (por serviço) ou MongoDB
+- **Banco de dados**: PostgreSQL
 - **Infraestrutura**: Docker Compose (local) + GitHub Actions (CI/CD)
 
 ---

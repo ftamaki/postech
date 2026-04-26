@@ -34,6 +34,12 @@ async def lifespan(app: FastAPI):
     consumer = RabbitMQConsumer(settings.RABBITMQ_URL, settings.QUEUE_NAME, use_case)
     consumer_task = asyncio.create_task(consumer.start())
 
+    def _on_consumer_done(task: asyncio.Task) -> None:
+        if not task.cancelled() and task.exception():
+            logger.critical(f"Consumer task encerrou com erro: {task.exception()}")
+
+    consumer_task.add_done_callback(_on_consumer_done)
+
     logger.info("Processing Service iniciado — consumindo fila")
     yield
 
